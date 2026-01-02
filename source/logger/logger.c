@@ -4,13 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* get_now_str() { // returns stack memory pointer
+char* get_now_str() { // returns heap memory pointer
     time_t now = time(NULL);
-    
     struct tm *local = localtime(&now);
     char *r_var = malloc(64 * sizeof(char));
-    strftime(r_var, 64, "%H:%M:%S", local);
 
+    strftime(r_var, 64, "%H:%M:%S", local);
+    
     return r_var;
 }
 
