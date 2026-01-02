@@ -1,9 +1,10 @@
 #ifndef VECTOR_H
 #define VECTOR_H
+#include <stdint.h>
 
 typedef struct Vector {
-    int x;
-    int y;
+    int32_t x;
+    int32_t y;
 } Vector;
 
 Vector* vec_init();

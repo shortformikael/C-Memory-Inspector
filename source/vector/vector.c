@@ -5,7 +5,6 @@
 
 Vector* vec_init() {
     Vector *r_vec = malloc(sizeof(*r_vec));
-
     r_vec->x = 0;
     r_vec->y = 0;
 
