@@ -6,7 +6,7 @@ void handler_run() {
     log_info("Started Handler");
 
     Vector *v = vec_init();
-    // vec_print(v);
+    vec_print(v);
 
     // vec_increment(v);
     // vec_print(v);

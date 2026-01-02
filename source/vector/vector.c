@@ -1,5 +1,6 @@
 #include "vector.h"
 #include "../logger/logger.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,13 +13,29 @@ Vector* vec_init() {
 }
 
 void vec_set(Vector *v, int x, int y) {
-    v->x = x;
-    v->y = y;
+    if (INT8_MIN < x && x < INT8_MAX) {
+        v->x = x;
+    } else {
+        if (INT8_MIN >= x) {
+            v->x = INT8_MIN;
+        } else {
+            v->x = INT8_MAX;
+        }
+    }
+
+    if (INT8_MIN < y && y < INT8_MAX) {
+        v->y = y;
+    } else {
+        if (INT8_MIN >= y) {
+            v->y = INT8_MIN;
+        } else {
+            v->y = INT8_MAX;
+        }
+    }
 }
 
 void vec_increment(Vector *v) {
-    v->x++;
-    v->y++;
+    vec_set(v, v->x+1, v->y+1);    
 }
 
 void vec_print(Vector *v) {

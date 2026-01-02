@@ -3,8 +3,8 @@
 #include <stdint.h>
 
 typedef struct Vector {
-    int32_t x;
-    int32_t y;
+    int8_t x;
+    int8_t y;
 } Vector;
 
 Vector* vec_init();
