@@ -3,5 +3,6 @@
 #include "../vector/vector.h"
 
 void minsp_log_vec(char *TYPE, Vector *v);
+void minsp_free();
 
 #endif
