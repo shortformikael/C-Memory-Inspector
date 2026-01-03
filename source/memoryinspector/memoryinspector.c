@@ -1,11 +1,16 @@
 #include "memoryinspector.h"
 #include "../logger/logger.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-#define STATUS_SIZE 16
 #define ADDRESS_SIZE 16
+#define FILE_SIZE 16
+#define LINE_SIZE 16
+#define STATUS_SIZE 8
+
+static void* (*real_malloc)(size_t) = malloc;
+static void (*real_free)(void *) = free;
+
 
 // Storing information on memalloc?
 // Start with storing in heap, then file
@@ -13,55 +18,35 @@
 
 typedef struct {
     char address[ADDRESS_SIZE];
-    int size;
+    char file[FILE_SIZE];
+    char line[LINE_SIZE];
     char status[STATUS_SIZE];
+    int size; //Bytes
 } MemoryEntry;
 
 MemoryEntry *entries = NULL;
 size_t entries_size = 0;
 
-MemoryEntry entry_init(char *TYPE, Vector *v) {
-    MemoryEntry r_var;
+void minsp_record_entry(void *ptr, int size, char *status, const char *file, int line) {
+    if (ptr == NULL) { return; }
 
-    sprintf(r_var.address, "%p", (void *) v);
-    r_var.size = (int) sizeof(*v);
-    sprintf(r_var.status, "%s",TYPE);
-
-    return r_var;
+    char entry[256];
+    // Address | Size | Status | File | Line    
+    sprintf(entry, ">%p|%d|%s|%s|%d\n", ptr, size, status, file, line);
+    printf("Entry: %s", entry); //Works
+    // Record into a file
 }
 
-void minsp_add_entry(char *TYPE, Vector *v){
-    entries_size++;
-
-    MemoryEntry *temp_entries = entries;
-    free(entries);
-    entries = malloc(entries_size * sizeof(MemoryEntry));
-    if (entries_size > 1) {
-        for (int i = 0; i < (int) entries_size; i++) {
-            entries[i] = temp_entries[i];
-        }
-    }
-    free(temp_entries);
-    
-    entries[entries_size - 1] = entry_init(TYPE, v);
+void* minsp_malloc(size_t size, const char *file, int line) {
+    void *ptr = real_malloc(size);
+    minsp_record_entry(ptr, (int) size, "MALLOC", file, line);
+    return ptr;
 }
 
-void minsp_log_vec_entry(char *TYPE, Vector *v) {
-    // printf("Vector info being logged - Address: %p, status: %s, size: %d\n", (void*) v, TYPE,(int) sizeof(*v));
-
-    if (entries_size == 0) {
-        minsp_add_entry(TYPE, v);
-    }
-
-    // Check if exist, true: update | false: add
-}
-
-void minsp_log_vec(char *TYPE, Vector *v) {
-    minsp_log_vec_entry(TYPE, v);
-
-    char type_buffer[256];
-    sprintf(type_buffer, "[MINSP] [%s]", TYPE);
-    log_info(type_buffer);
+void minsp_free(void *ptr, const char *file, int line) {
+    // update entry
+    minsp_record_entry(ptr, 0, "FREE", file, line);
+    real_free(ptr);
 }
 
 void priv_insert_into_string(char *s, char *c, int o) {
@@ -130,11 +115,10 @@ void minsp_print() {
     printf("%s\n", tmp_break);
 }
 
-void minsp_free(){
+void minsp_free_all(){
 
     minsp_print();
-
-    free(entries);
+    // free(entries);
     entries = NULL;
     entries_size = 0;
 

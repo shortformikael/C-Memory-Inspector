@@ -2,7 +2,7 @@
 #include "../logger/logger.h"
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include "../memoryinspector/memoryinspector.h"
 
 Vector* vec_init() {
     Vector *r_vec = malloc(sizeof(*r_vec));
